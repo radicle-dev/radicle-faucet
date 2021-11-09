@@ -114,7 +114,7 @@ contract FaucetV1Test is DSTest {
 
 contract Token is IERC20 {
     string public symbol;
-    mapping(address => uint256) public override balanceOf;
+    mapping(address => uint256) public balanceOf;
 
     constructor(string memory _symbol, uint256 supply) {
         symbol = _symbol;

@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 interface IERC20 {
     function transferFrom( address src, address dst, uint256 rawAmount) external returns (bool);
-    function balanceOf(address account) external view returns (uint256);
 }
 
 /// A RAD Faucet
@@ -21,7 +20,6 @@ contract FaucetV1 {
     }
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    event Transfer(address indexed _from, address indexed _to, uint256 indexed _amount);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Faucet: Only the faucet owner can perform this action.");
@@ -62,10 +60,8 @@ contract FaucetV1 {
     }
 
     /// @notice Recover funds in faucet to owner
-    function recoverFunds(IERC20 _token) public onlyOwner {
-        uint balance = _token.balanceOf(address(this));
-        _token.transferFrom(address(this), owner, balance);
-        emit Transfer(address(this), owner, balance);
+    function recoverFunds(IERC20 _token, uint256 _amount) public onlyOwner {
+        _token.transferFrom(address(this), owner, _amount);
     }
 
     /// @notice Creates a transaction to withdraw a defined amount of tokens
@@ -75,8 +71,6 @@ contract FaucetV1 {
         require(lastWithdrawalByUser[msg.sender] + calculateTimeLock(_amount) < block.timestamp, "Faucet: Not allowed to withdrawal at the moment");
 
         _token.transferFrom(address(this), msg.sender, _amount);
-        lastWithdrawalByUser[msg.sender] = block.timestamp;
-        
-        emit Transfer(address(this), msg.sender, _amount);
+        lastWithdrawalByUser[msg.sender] = block.timestamp; 
     }
 }
